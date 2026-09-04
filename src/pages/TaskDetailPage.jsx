@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 function TaskDetailPage() {
   const { projectId, taskId } = useParams();
   const [task, setTask] = useState(null);
-
+const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   useEffect(() => {
     const fetchTask = async () => {
       const response = await fetch(
