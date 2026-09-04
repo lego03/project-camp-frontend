@@ -13,6 +13,10 @@ function ProjectsPage({ user, setUser }) {
         method: "GET",
         credentials: "include",
       });
+      if (!response.ok) {
+    setProjects([]); // fail safely instead of crashing
+    return;
+  }
       const data = await response.json();
       setProjects(data.data);
     };
