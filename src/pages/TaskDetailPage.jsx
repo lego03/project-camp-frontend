@@ -5,6 +5,10 @@ function TaskDetailPage() {
   const { projectId, taskId } = useParams();
   const [task, setTask] = useState(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  
+  // 🚀 New State for Manual Subtask Input
+  const [manualTitle, setManualTitle] = useState("");
+  const [isAddingManual, setIsAddingManual] = useState(false);
 
   // Helper function to re-fetch task from DB
   const fetchTask = async () => {
@@ -46,13 +50,43 @@ function TaskDetailPage() {
     }));
   };
 
+  // 🚀 Manual Subtask Creation Function
+  const handleAddManualSubtask = async (e) => {
+    e.preventDefault();
+    if (!manualTitle.trim()) return;
+
+    setIsAddingManual(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/tasks/${projectId}/t/${taskId}/subtasks`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ title: manualTitle.trim() }),
+        }
+      );
+
+      if (response.ok) {
+        setManualTitle(""); // Clear input
+        await fetchTask(); // Refresh task list
+      } else {
+        const data = await response.json();
+        alert(data.message || "Failed to add subtask");
+      }
+    } catch (error) {
+      console.error("Error adding subtask:", error);
+    } finally {
+      setIsAddingManual(false);
+    }
+  };
+
   // 🚀 AI Subtask Generation Function
   const handleGenerateAISubtasks = async () => {
     if (!task) return;
     setIsGeneratingAI(true);
 
     try {
-      // 1. Call AI endpoint
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/tasks/ai-subtasks`,
         {
@@ -74,9 +108,9 @@ function TaskDetailPage() {
         return;
       }
 
-      const generatedTitles = data.data; // Array of subtask strings
+      const generatedTitles = data.data;
 
-      // 2. Save each generated subtask to MongoDB
+      // Save each generated subtask to MongoDB
       for (const title of generatedTitles) {
         await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/tasks/${projectId}/t/${taskId}/subtasks`,
@@ -89,7 +123,6 @@ function TaskDetailPage() {
         );
       }
 
-      // 3. Re-fetch task to sync state with database
       await fetchTask();
 
     } catch (error) {
@@ -138,30 +171,44 @@ function TaskDetailPage() {
         </div>
         <p className="text-stone-400 mb-8">{task.description}</p>
 
-        {/* Subtasks Header + AI Button */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-lg font-bold text-stone-100">Subtasks</h2>
+        {/* Section Title */}
+        <h2 className="font-display text-lg font-bold text-stone-100 mb-4">Subtasks</h2>
+
+        {/* 🚀 Manual Input Form + AI Button Bar */}
+        <form onSubmit={handleAddManualSubtask} className="flex gap-2 mb-6">
+          <input
+            type="text"
+            placeholder="Add a subtask"
+            value={manualTitle}
+            onChange={(e) => setManualTitle(e.target.value)}
+            className="flex-1 bg-stone-900 border border-stone-800 rounded-xl px-4 py-2.5 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:border-stone-700 transition-colors"
+          />
+          
+          {/* Manual Add Button */}
+          <button
+            type="submit"
+            disabled={isAddingManual || !manualTitle.trim()}
+            className="bg-stone-800 hover:bg-stone-700 disabled:opacity-40 text-stone-200 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed"
+          >
+            {isAddingManual ? "Adding..." : "+ Add"}
+          </button>
+
+          {/* AI Generation Button */}
           <button
             type="button"
             onClick={handleGenerateAISubtasks}
             disabled={isGeneratingAI}
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-900/50 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-900/50 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed whitespace-nowrap"
           >
-            {isGeneratingAI ? (
-              <>
-                <span className="animate-spin">✨</span> Generating AI Subtasks...
-              </>
-            ) : (
-              <>✨ Generate with AI</>
-            )}
+            {isGeneratingAI ? "✨ Generating..." : "✨ Generate with AI"}
           </button>
-        </div>
+        </form>
 
         {/* Subtasks List */}
         {task.subtasks.length === 0 ? (
           <div className="bg-stone-900/50 border border-dashed border-stone-800 rounded-xl p-6 text-center">
-            <p className="text-stone-500 text-sm mb-3">No subtasks yet.</p>
-            <p className="text-stone-600 text-xs">Click "✨ Generate with AI" above to automatically create actionable subtasks!</p>
+            <p className="text-stone-500 text-sm mb-1">No subtasks yet.</p>
+            <p className="text-stone-600 text-xs">Type a subtask above or click "✨ Generate with AI"!</p>
           </div>
         ) : (
           <div className="space-y-2">
