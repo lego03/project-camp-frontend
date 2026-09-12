@@ -15,7 +15,7 @@ function ProjectAnalytics({ projectId, refreshkey }) {
     const fetchAnalytics = async () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/projects/${projectId}/analytics`,
-        { method: "GET", credentials: "include" },
+        { method: "GET", credentials: "include" ,  cache: "no-store"},
       );
 
       if (!response.ok) return; // fail safely, same defensive habit as before
