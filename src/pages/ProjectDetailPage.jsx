@@ -13,7 +13,7 @@ function ProjectDetailPage({ user }) {
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState("member");
-
+  const [analyticsRefreshKey, setAnalyticsRefreshKey] = useState(0);
   useEffect(() => {
     const fetchProject = async () => {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/projects/${projectId}`, {
@@ -80,6 +80,7 @@ const handleStatusChange = async (taskId, newStatus) => {
       task._id === taskId ? { ...task, status: newStatus } : task,
     ),
   );
+  setAnalyticsRefreshKey((prev) => prev + 1); // trigger analytics refresh
 };
   const handleCreateTask = async (e) => {
     e.preventDefault();
@@ -162,7 +163,7 @@ const handleStatusChange = async (taskId, newStatus) => {
         <div className="mb-10">
           <h1 className="font-display text-2xl font-bold text-stone-100">{project.name}</h1>
           <p className="text-stone-400 mt-1">{project.description}</p>
-          <ProjectAnalytics projectId={projectId} />
+          <ProjectAnalytics projectId={projectId} refreshkey={setAnalyticsRefreshKey} />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">

@@ -8,7 +8,7 @@ const STATUS_COLORS = {
   done: "#10b981",        // emerald
 };
 
-function ProjectAnalytics({ projectId }) {
+function ProjectAnalytics({ projectId, refreshkey }) {
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function ProjectAnalytics({ projectId }) {
     };
 
     fetchAnalytics();
-  }, [projectId]);
+  }, [projectId, refreshkey]);
 
   if (!analytics) {
     return <p className="text-stone-500 text-sm">Loading analytics...</p>;
