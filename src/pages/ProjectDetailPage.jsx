@@ -163,7 +163,7 @@ const handleStatusChange = async (taskId, newStatus) => {
         <div className="mb-10">
           <h1 className="font-display text-2xl font-bold text-stone-100">{project.name}</h1>
           <p className="text-stone-400 mt-1">{project.description}</p>
-          <ProjectAnalytics projectId={projectId} refreshkey={setAnalyticsRefreshKey} />
+          <ProjectAnalytics projectId={projectId} refreshkey={analyticsRefreshKey} />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
