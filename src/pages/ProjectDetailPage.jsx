@@ -8,7 +8,7 @@ function ProjectDetailPage({ user }) {
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
-
+  const [statusError, setStatusError] = useState("");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newMemberEmail, setNewMemberEmail] = useState("");
@@ -52,7 +52,35 @@ function ProjectDetailPage({ user }) {
 
   const currentUserMembership = members.find((member) => member.user._id === user._id);
   const currentUserRole = currentUserMembership?.role;
+const handleStatusChange = async (taskId, newStatus) => {
+  setStatusError("");
 
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/tasks/${projectId}/t/${taskId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ status: newStatus }),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    setStatusError(data.message || "Failed to update status");
+    return;
+  }
+
+  // FIX: this page has a `tasks` array, not a single `task` object —
+  // find the one task that changed, leave every other task in the array untouched.
+  // Same pattern as the subtask-toggle logic in TaskDetailPage.
+  setTasks((prevTasks) =>
+    prevTasks.map((task) =>
+      task._id === taskId ? { ...task, status: newStatus } : task,
+    ),
+  );
+};
   const handleCreateTask = async (e) => {
     e.preventDefault();
 
@@ -121,13 +149,14 @@ function ProjectDetailPage({ user }) {
   return (
     <div className="min-h-screen bg-stone-950">
       <header className="bg-stone-900 border-b border-stone-800">
+        {statusError && <p className="text-sm text-red-400 mb-2">{statusError}</p>}
         <div className="max-w-5xl mx-auto px-6 py-4">
           <Link to="/projects" className="text-sm text-stone-400 hover:text-accent transition-colors">
             ← Back to Projects
           </Link>
         </div>
       </header>
-
+       
       <main className="max-w-5xl mx-auto px-6 py-10">
         {/* Project header */}
         <div className="mb-10">
@@ -146,18 +175,23 @@ function ProjectDetailPage({ user }) {
             ) : (
               <div className="space-y-2 mb-6">
                 {tasks.map((task) => (
-                  <button
-                    key={task._id}
-                    onClick={() => navigate(`/projects/${projectId}/tasks/${task._id}`)}
-                    className="w-full text-left bg-stone-900 border border-stone-800 rounded-xl px-4 py-3 flex items-center justify-between hover:border-accent transition-colors"
-                  >
-                    <span className="text-stone-100 font-medium">{task.title}</span>
-                    <span
-                      className={`text-xs font-medium rounded-full px-2.5 py-1 ${statusStyles[task.status] || statusStyles.todo}`}
-                    >
-                      {task.status}
-                    </span>
-                  </button>
+                  <div
+                        key={task._id}
+                        onClick={() => navigate(`/projects/${projectId}/tasks/${task._id}`)}
+                        className="w-full text-left bg-stone-900 border border-stone-800 rounded-xl px-4 py-3 flex items-center justify-between hover:border-accent transition-colors cursor-pointer"
+                      >
+                        <span className="text-stone-100 font-medium">{task.title}</span>
+                        <select
+                          value={task.status}
+                          onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs font-medium rounded-full px-2.5 py-1 bg-stone-800 text-stone-200 border border-stone-700"
+                        >
+                          <option value="todo">todo</option>
+                          <option value="in_progress">in_progress</option>
+                          <option value="done">done</option>
+                        </select>
+                </div>
                 ))}
               </div>
             )}
