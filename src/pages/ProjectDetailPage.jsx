@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-
+import ProjectAnalytics from "../components/ProjectAnalytics";
 function ProjectDetailPage({ user }) {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -133,6 +133,7 @@ function ProjectDetailPage({ user }) {
         <div className="mb-10">
           <h1 className="font-display text-2xl font-bold text-stone-100">{project.name}</h1>
           <p className="text-stone-400 mt-1">{project.description}</p>
+          <ProjectAnalytics projectId={projectId} />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
