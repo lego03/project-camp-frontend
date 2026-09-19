@@ -162,7 +162,13 @@ function TaskDetailPage() {
 
       <main className="max-w-3xl mx-auto px-6 py-10">
         <div className="flex items-center gap-3 mb-2">
-          <h1 className="font-display text-2xl font-bold text-stone-100">{task.title}</h1>
+          <div className="flex flex-col">
+  <span className="text-stone-100 font-medium">{task.title}</span>
+  <span className="text-xs text-stone-500">
+    {task.assignedTo?.username ? `Assigned to ${task.assignedTo.username}` : "Unassigned"}
+    {task.dueDate && ` · Due ${new Date(task.dueDate).toLocaleDateString()}`}
+  </span>
+</div>
           <span
             className={`text-xs font-medium rounded-full px-2.5 py-1 ${statusStyles[task.status] || statusStyles.todo}`}
           >
@@ -170,6 +176,7 @@ function TaskDetailPage() {
           </span>
         </div>
         <p className="text-stone-400 mb-8">{task.description}</p>
+
 
         {/* Section Title */}
         <h2 className="font-display text-lg font-bold text-stone-100 mb-4">Subtasks</h2>
