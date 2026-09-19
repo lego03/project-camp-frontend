@@ -166,7 +166,11 @@ function TaskDetailPage() {
   <span className="text-stone-100 font-medium">{task.title}</span>
   <span className="text-xs text-stone-500">
     {task.assignedTo?.username ? `Assigned to ${task.assignedTo.username}` : "Unassigned"}
-    {task.dueDate && ` · Due ${new Date(task.dueDate).toLocaleDateString()}`}
+    {task.dueDate && (
+  <p className="text-sm text-stone-500 mb-2">
+    Due: {new Date(task.dueDate).toLocaleDateString()}
+  </p>
+)}
   </span>
 </div>
           <span
