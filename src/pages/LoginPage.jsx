@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "motion/react";
 
 function LoginPage({ setUser }) {
   const [email, setEmail] = useState("");
@@ -30,14 +31,26 @@ function LoginPage({ setUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
+    <div className="min-h-screen bg-stone-950 flex items-center justify-center p-4 relative overflow-hidden">
+      <motion.div
+        className="absolute w-72 h-72 rounded-full bg-accent/20 blur-3xl pointer-events-none"
+        style={{ top: "15%" }}
+        animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.08, 1] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      <div className="w-full max-w-sm relative">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h1 className="font-display text-2xl font-bold text-stone-100 tracking-tight">
             Project Camp
           </h1>
           <p className="text-stone-500 text-sm mt-1">Sign in to your workspace</p>
-        </div>
+        </motion.div>
 
         <div className="bg-stone-900 border border-stone-800 rounded-2xl shadow-sm p-8">
           {error && (
@@ -69,12 +82,13 @@ function LoginPage({ setUser }) {
               />
             </div>
 
-            <button
+            <motion.button
               type="submit"
+              whileTap={{ scale: 0.97 }}
               className="w-full bg-accent text-stone-950 font-semibold rounded-lg py-2.5 hover:opacity-90 transition-opacity"
             >
               Log in
-            </button>
+            </motion.button>
           </form>
         </div>
 
