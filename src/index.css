@@ -1,6 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Slab:wght@500;700&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+/* "Woodsmoke" theme — overriding Tailwind's own stone-* scale directly,
+   so every bg-stone-950/900, border-stone-800/700 already used across
+   the app automatically becomes this palette. Nothing else needs to change. */
+@theme {
+  --font-display: "IBM Plex Slab", serif;
+  --color-accent: #f2751a; /* campfire orange */
+
+  --color-stone-950: #1b1d17; /* page background — dark forest-olive */
+  --color-stone-900: #292a20; /* card surfaces — warm wood-brown */
+  --color-stone-800: #3d3d2c; /* borders */
+  --color-stone-700: #4a4a35; /* input borders/backgrounds */
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #1b1d17;
+}
+
+
+/* @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Slab:wght@500;700&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
 
 @theme {
   --font-display: "IBM Plex Slab", serif;
@@ -10,4 +32,4 @@
 body {
   font-family: "Inter", sans-serif;
   background-color: #0c0a09; 
-}
+} */
